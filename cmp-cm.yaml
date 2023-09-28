@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kustomize-docker-plugin
+data:
+  plugin.yaml: |
+    apiVersion: argoproj.io/v1alpha1
+    kind: ConfigManagementPlugin
+    metadata:
+      name: kustomize-docker-plugin
+    spec:
+      discover:
+        find:
+          command: [sh, -c, find . -name template-generator.yaml]
+      generate:
+        command: ["sh", "-c"]
+        args: ["kustomize build --enable-alpha-plugins"]
+      init:
+        command: ["sh", "-c"]
+        args: ["mkdir -p /tmp/docker"]
+      allowConcurrency: true
+      lockRepo: false

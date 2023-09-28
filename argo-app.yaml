@@ -1,0 +1,20 @@
+# This part is very important on getting podman working. Figuring out these env vars has been brutal
+# It's probably better to load these in your container spec,
+# but this is the one file not under version control and so it's been easy iteration for me.
+# feel free to change up as needed
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: test-kustomize-docker
+  namespace: argocd
+spec:
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: https://github.com/joakimhew/argocd-krm-test.git
+    targetRevision: master
+    path: kustomize
+
+    plugin: {}

@@ -1,0 +1,38 @@
+# kubectl patch deployment argocd-repo-server --patch-file argocd-repo-server-deploy.patch.yaml -n argocd
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-repo-server
+  namespace: argocd
+spec:
+  template:
+    spec:
+      containers:
+        - name: kustomize-docker
+          command: [/var/run/argocd/argocd-cmp-server]
+          image: localhost:5001/kustomize-sidecar
+          securityContext:
+            capabilities:
+              add:
+                - SETGID
+                - SETUID
+            runAsNonRoot: true
+
+            privileged: true
+            runAsUser: 999
+
+          volumeMounts:
+            - mountPath: /var/run/argocd
+              name: var-files
+            - mountPath: /home/argocd/cmp-server/plugins
+              name: plugins
+
+            - mountPath: /tmp
+              name: tmp
+            - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+              subPath: plugin.yaml
+              name: kustomize-docker-plugin
+      volumes:
+        - configMap:
+            name: kustomize-docker-plugin
+          name: kustomize-docker-plugin
